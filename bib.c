@@ -3,86 +3,79 @@
 #include <string.h>
 #include <stdlib.h>
 
-void criaArv(arv *raiz){  // Inicializa arvore
-  *raiz = NULL;
-  return;
+arv criaArv(){  // Inicializa arvore
+  return arv init=NULL;
 }
 
-//////////////////////////////////////////////////////q
-no criaNo(arv T, int k){ // Cria novo nodo
-  no p;
 
-  p = (no) malloc( sizeof(no) );
-  p->chave = k;
-  p->pai = T->NIL;
-  p->esq = T->NIL;
-  p->dir = T->NIL;
-  return p;
-}
+////////////////////////////////////////////////////////// Deve ser tratado o caso de haver mais de uma chave igual na arvore!!!
 
-///////////////////////////////////////////////////////////
-
-
-
-void RB_insert(arv T, no z){
+char *insere (no *raiz, char *chave, char *conteudo){
     no x,y;
-    y = T->NIL;      // no y vai apontar para o pai de x
-    x = T->raiz;
+    no z;
 
-	while(x != T->NIL){ // Quando x for NILL, y sera pai de x. (sabe onde inserir novo nodo)
-		y = x;
-		if(z->chave < x->chave)
-			x = x->esq;
-		else
-			x = x->dir;
+    z = (no) malloc(sizeof(struct nodo));   //
+    z->chave = chave;                //  EFETUANDO A 
+    z->conteudo = conteudo;          //  INSERCAO
+    z->pai = z->esq = z->dir = NULL; //
+
+    
+    if( (raiz) == NULL){ // se arvore for vazia, raiz recebe z
+        z->cor = BLACK;
+        *raiz = z; // primeira insercao na arvore
     }
+    else{
+        y = NULL;      // no y vai apontar para o pai de x
 
-	z->pai = y;
-	if( y == T->NIL ) // se arvore for vazia, raiz recebe z
-		T->raiz = z; // primeira insercao na arvore
-	else // senao ira verificar se chave eh menor ou maior que y->chave (y = folha)
-           if(z->chave < y->chave)
-               y->esq = z;
-           else
-               y->dir = z;
-    z->esq = T->NIL;
-    z->dir = T->NIL;
-    z->cor = RED; // insere sempre vermelho
-    RB_insert_fixup(T, z); // chama funcao para arrumar a arvore
+        x = *raiz;
+	    while(x != NULL){ // Quando x for NILL, y sera pai de x. (sabe onde inserir novo nodo)
+		    y = x;
+	       	if(z->chave == x->chave)
+                return NULL;
+            else if (z->chave < x->chave)            
+			    x = x->esq;
+            else
+			    x = x->dir;
+        }
+	    z->pai = y;
+            if(z->chave < y->chave) //aqui ira verificar se chave eh menor ou maior que y->chave (y = folha)
+                y->esq = z;
+            else
+                y->dir = z;
+        z->esq = NULL;
+        z->dir = NULL;
+        z->cor = RED; // insere sempre vermelho
+        arrumaRedBlack(raiz, z); // chama funcao para arrumar a arvore
+    }
+    return z->conteudo;
 }
 
 
 
 //////////////////////////////////////////////////////////////
-void RB_insert_fixup(arv T, no z)
-{
+void arrumaRedBlack(no *raiz, no z){
     no y;
-    while(z->pai->cor==RED)
-    {
-        if(z->pai == z->pai->pai->esq)  //se eu sou filho a esquerda do meu pai
-        {
+    char *conteudo;
+    while(z->pai->cor==RED){
+        if(z->pai == z->pai->pai->esq){ //se eu sou filho a esquerda do meu pai
             y = z->pai->pai->dir;
-            if(y->cor==RED)         //CASO1: 2 pretos consecutivos e tio RED
-            {
+            if(y->cor==RED){            //CASO1: 2 pretos consecutivos e tio RED
                 z->pai->cor=BLACK;
                 y->pai->cor=BLACK; //y e meu tio
                 z->pai->pai->cor=RED;
                 z=z->pai->pai; //z e meu avo
             }
-            else
-            {
-                if(z==z->pai->dir) //CASO 2: rotacao zig-zag
-                {
+            else{
+                if(z==z->pai->dir){ //CASO 2: rotacao zig-zag
                     z=z->pai;
-                    rot_esq(T,z);
+                    rot_esq(raiz,z);
                 }
                 z->pai->cor=BLACK; //CASO 3: tio e preto e eu nao posso recolorir
                 z->pai->pai->cor=RED;
-                rot_dir(T,z);
+                rot_dir(raiz,z);
             }
         }
-        else
-        {
+        else{
             y = z->pai->pai->esq;
             if(y->cor==RED)         //CASO1: 2 pretos consecutivos e tio RED
             {
@@ -96,15 +89,15 @@ void RB_insert_fixup(arv T, no z)
                 if(z==z->pai->esq) //CASO2: rotacao zig-zag
                 {
                     z=z->pai;
-                    rot_dir(T,z);
+                    rot_dir(raiz,z);
                 }
                 z->pai->cor=BLACK; //CASO3: tio eh preto e eu nao posso recolorir
                 z->pai->pai->cor=RED;
-                rot_esq(T,z);
+                rot_esq(raiz,z);
             }
         }
     }
-    T->raiz->cor=BLACK;
+    (*raiz)->cor=BLACK; // OLHAR BEM ESSA PARTE!!!
 }
 
 
@@ -112,14 +105,14 @@ void RB_insert_fixup(arv T, no z)
 ////////////////////////////
 // Rotacoes na arvore //////
 ////////////////////////////
-void rot_esq(arv T, no z){
+void rot_esq(no *raiz, no z){
 	no y;
 	y = z->dir;
 	z->dir = y->esq;
 	y->esq->pai = z;
 	y->pai = z->pai;
-	if (z->pai == T->NIL)
-		T->raiz = y;
+	if (z->pai == NULL)
+		*raiz = y;
 	else if (z = z->pai->esq)
 		z->pai->esq = y;
 	else
@@ -128,14 +121,14 @@ void rot_esq(arv T, no z){
 	z->pai = y;
 }
 
-void rot_dir(arv T, no z){
+void rot_dir(no *raiz, no z){
 	no y;
 	y = z->esq;
 	z->esq = y->dir;
 	y->dir->pai = z;
 	y->pai = z->pai;
-	if (z->pai == T->NIL)
-		T->raiz = y;
+	if (z->pai == NULL)
+		*raiz = y;
 	else if (z = z->pai->esq)
 		z->pai->dir = y;
 	else
