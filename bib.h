@@ -1,39 +1,38 @@
 #ifndef _bib_h
 #define _bib_h
 
+////////// http://en.literateprograms.org/Red-black_tree_%28C%29
+////////// https://gist.github.com/pallas/10697727
 
 
-enum colorType {RED,BLACK};
 
-typedef enum colorType tipoCor;
-typedef struct nodo *nodoNulo;
+typedef enum colorType {RED,BLACK} tipoCor;
 typedef struct nodo *no;
 typedef struct nodo *apontador;
 typedef struct arvore *arv;
 
 struct arvore{
 	no raiz;
-	nodoNulo NIL;
 };
 
 struct nodo {
-	int chave;
+	char *chave;
+	char *conteudo;
 	apontador esq, dir;
 	apontador pai;
 	tipoCor cor;
 };
 
 
-void criaArv(arv *raiz);
 
-no criaNo( arv T, int k );
+arv criaArv();
 
-void RB_insert(arv T, no z);
+char *insere (no *raiz, char *chave, char *conteudo);
 
-void RB_insert_fixup(arv T, no z);
+void arrumaRedBlack(no *raiz, no z);
 
-void rot_esq(arv T, no z);
+void rot_esq(no *raiz, no z);
 
-void rot_dir(arv T, no z);
+void rot_dir(no *raiz, no z);
 
 #endif
